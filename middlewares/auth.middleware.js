@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/env.js";
 import User from "../models/user.model.js";
 
-const authorize = async (req, res, next) => {
+export const authorize = async (req, res, next) => {
   try {
     let token;
 
@@ -30,4 +30,18 @@ const authorize = async (req, res, next) => {
   }
 };
 
-export default authorize;
+export const adminOnly = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      message: "Unauthorized",
+    });
+  }
+
+  if (req.user.role !== "admin") {
+    return res.status(403).json({
+      message: "Access denied. Admins only.",
+    });
+  }
+
+  next();
+};
